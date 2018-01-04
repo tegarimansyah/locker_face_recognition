@@ -15,11 +15,13 @@ facedict = {}
 
 def face_init():
     import csv
+    import numpy as np
     global facedict
     with open('static/config.csv') as f:
         reader = csv.reader(f)
         for row in reader:
-            facedict[row[1]] = [float(x) for x in row[2].rstrip().split()]
+            a = row[2].replace('[','').replace(']','')
+            facedict[row[1]] = [float(x) for x in a.rstrip().split()]
     
 def encode(filename):
     # menguploud contoh gambardan mempelajari cara mengenalinya .
@@ -44,23 +46,19 @@ def check(img):
     #small_frame = cv2.resize(img, (0, 0), fx=0.25, fy=0.25)
     face_locations = face_recognition.face_locations(frame)
     face_encodings = face_recognition.face_encodings(frame, face_locations)
-    
-    print(facedict.values())
-    print(type(facedict.values()))
           
     for face_encoding in face_encodings:
         command.log('Face found, checking')
-        match = face_recognition.compare_faces(facedict.values(), face_encoding)
+        match = face_recognition.compare_faces(list(facedict.values()), face_encoding)
         i = 0
         for key, value in facedict.items() :
             if match[i]:
                 name = key
-                command.log(key + 'detected')
+                command.log(key + ' detected')
                 break
             command.log('Bukan ' + key)
             i+=1
-        face_names.append(name)
-    print(face_names)
+    face_names.append(name)
     
     # menampilkan hasilnya hasilnya
     for (top, right, bottom, left), name in zip(face_locations, face_names):
@@ -71,14 +69,16 @@ def check(img):
 ##        left *= 4
 
         # gambar kotak disekitar wajah
+        frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # memberi label dengan nama dibawah wajah
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-        
-    return (face_names, cv2.imencode('.jpg',frame)[1].tobytes())
+    
+    cv2.imwrite('result.jpg',frame)        
+    return (name, cv2.imencode('.jpg',frame)[1].tobytes())
     
     
 ##

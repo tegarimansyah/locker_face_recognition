@@ -36,12 +36,15 @@
 			<img src="{{ url_for('static',filename='img/' + row[0])}}" class="center-block" style="width:100%;height:auto;">
 			<div class="btn-group">
 				<span style="display:block"> {{ row[1] }} </span>
-				<button class="btn btn-default" type="button">
-					<em class="glyphicon glyphicon-pencil"></em> Edit
-				</button> 
-				<button class="btn btn-default" type="button">
-					<em class="glyphicon glyphicon-trash"></em> Hapus
-				</button> 
+				<form action="pengaturan" method="post" style="display: inline">
+				<input type="hidden" name="nama" value="{{ row[1] }}">
+				<input type="submit" class="btn btn-default" name="edit" value="Edit" />
+				</form>
+
+				<form action="pengaturan" method="post" style="display: inline">
+				<input type="hidden" name="nama" value="{{ row[1] }}">
+				<input type="submit" class="btn btn-default" name="hapus" value="Hapus" />
+				</form>
 				
 				<a id="modal-{{ row[1] }}" href="#modal-container-{{ row[1] }}" role="button" data-toggle="modal">
 				<button class="btn btn-default" type="button">

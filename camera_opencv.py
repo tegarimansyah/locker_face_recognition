@@ -23,7 +23,7 @@ class Camera(BaseCamera):
             #print("Img type: ",  type(img))
             if Camera.save:
                 if not Path('test.jpg').is_file():
-                    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                    #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                     cv2.imwrite("test.jpg", img)
                 #print("Save mode: ", Camera.save)
                 #yield cv2.imencode('.jpg',cv2.imread('test.jpg'))[1]

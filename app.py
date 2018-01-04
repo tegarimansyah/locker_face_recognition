@@ -13,6 +13,7 @@ ALLOWED_EXTENSIONS = set(['jpeg', 'jpg', 'png'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 name = ''
+checking_done = False
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -22,17 +23,26 @@ def allowed_file(filename):
 def index():
     label=''
     if request.method == 'POST':
+        global checking_done
+        global name
         if request.form['submit'] == 'Buka Loker':
             Camera.save = not Camera.save
             if Camera.save:
-##                import time
-##                time.sleep(3)
-                global name
-                if name is not "Tidak ditemukan":
+                from time import sleep
+                print('Memeriksa Wajah')
+
+                checking_done = False
+                while not checking_done:
+                    pass
+                if name is not "Wajah tidak dikenal":
+                    print('Membuka loker milik: ' + name)
                     label = 'Membuka Loker Milik ' + name
                 else:
+                    print('Wajah tidak dikenal')
                     label = 'Wajah tidak dikenal'
             else:
+                checking_done = False
+                print('Menunggu perintah')
                 label = ''
                 
     return render_template('index.html', label=label)
@@ -40,9 +50,15 @@ def index():
 def gen(camera):
     while True:
         if camera.save:
+             import cv2
              img = camera.get_frame()
              global name
-             name, frame = check(img)
+             global checking_done
+             if not checking_done:
+                 name, frame = check(img)
+                 checking_done = True
+                 print("Checking Done")
+             frame = cv2.imencode('.jpg',cv2.imread('result.jpg'))[1].tobytes()
         else:
              frame = camera.get_frame().tobytes()
              
@@ -57,6 +73,27 @@ def video_feed():
 @app.route('/pengaturan', methods=['GET', 'POST'])
 def pengaturan():
     if request.method == 'POST':
+        try:
+            if request.form['hapus'] == 'Hapus':
+                print('menghapus ' + request.form['nama'])
+                reader = csv.reader(open('static/config.csv'), delimiter=',')
+                f = csv.writer(open("static/config.backup.csv", "w"))
+                for line in reader:
+                    if request.form['nama'] not in line:
+                        f.writerow(line)
+                os.rename('static/config.backup.csv','static/config.csv')
+                os.remove('static/config.backup.csv')
+                return redirect(url_for('pengaturan'))
+        except:
+            pass
+        
+        try:
+            if request.form['edit'] == 'Edit':
+                print('mengedit ' + request.form['nama'])
+                return redirect(url_for('pengaturan'))
+        except:
+            pass
+        
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -71,9 +108,9 @@ def pengaturan():
             with open('static/config.csv', 'a') as fp:
                 a = csv.writer(fp, delimiter=',')
                 data = [[filename, request.form['nama'], encoded]]
-                a.writerows(data)
-            return redirect(url_for('pengaturan'))
-    
+                print(data)
+                a.writerows(data) 
+
     with open('static/config.csv') as f:
         reader = csv.reader(f)
         return render_template('pengaturan.html', reader=reader)
