@@ -34,7 +34,7 @@ def index():
                 checking_done = False
                 while not checking_done:
                     pass
-                if name is not "Wajah tidak dikenal":
+                if not name is "Wajah tidak dikenal":
                     print('Membuka loker milik: ' + name)
                     label = 'Membuka Loker Milik ' + name
                 else:
@@ -76,13 +76,13 @@ def pengaturan():
         try:
             if request.form['hapus'] == 'Hapus':
                 print('menghapus ' + request.form['nama'])
+                # mungkin ada yang harus di close
                 reader = csv.reader(open('static/config.csv'), delimiter=',')
                 f = csv.writer(open("static/config.backup.csv", "w"))
                 for line in reader:
                     if request.form['nama'] not in line:
                         f.writerow(line)
                 os.rename('static/config.backup.csv','static/config.csv')
-                os.remove('static/config.backup.csv')
                 return redirect(url_for('pengaturan'))
         except:
             pass
@@ -110,7 +110,8 @@ def pengaturan():
                 data = [[filename, request.form['nama'], encoded]]
                 print(data)
                 a.writerows(data) 
-
+    face_init()
+    
     with open('static/config.csv') as f:
         reader = csv.reader(f)
         return render_template('pengaturan.html', reader=reader)
