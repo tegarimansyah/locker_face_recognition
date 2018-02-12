@@ -34,9 +34,15 @@ def index():
                 checking_done = False
                 while not checking_done:
                     pass
+                
                 if not name is "Wajah tidak dikenal":
                     print('Membuka loker milik: ' + name)
                     label = 'Membuka Loker Milik ' + name
+                    
+                    import serial
+                    ser = serial.Serial("/dev/serial0",9600)
+                    ser.write(name)
+                    
                 else:
                     print('Wajah tidak dikenal')
                     label = 'Wajah tidak dikenal'
