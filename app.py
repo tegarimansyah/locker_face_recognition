@@ -25,31 +25,51 @@ def index():
     if request.method == 'POST':
         global checking_done
         global name
-        if request.form['submit'] == 'Buka Loker':
-            Camera.save = not Camera.save
-            if Camera.save:
-                from time import sleep
-                print('Memeriksa Wajah')
-
-                checking_done = False
-                while not checking_done:
-                    pass
+        
+        try:
+            if request.form['simpan'] == 'Simpan':
+                print('menyimpan ' + request.form['nama'])
+                                        
+                import serial
+                ser = serial.Serial("/dev/serial0",9600)
+                kirim_data = '>simpan#' + request.form['nama'] + '<'
+                print(kirim_data)
+                ser.write(kirim_data.encode())
                 
-                if not name is "Wajah tidak dikenal":
-                    print('Membuka loker milik: ' + name)
-                    label = 'Membuka Loker Milik ' + name
+                return redirect(url_for('/'))
+        except:
+            pass
+        
+        try:
+            if request.form['submit'] == 'Buka Loker':
+                Camera.save = not Camera.save
+                if Camera.save:
+                    from time import sleep
+                    print('Memeriksa Wajah')
+
+                    checking_done = False
+                    while not checking_done:
+                        pass
                     
-                    import serial
-                    ser = serial.Serial("/dev/serial0",9600)
-                    ser.write(name)
-                    
+                    if not name is "Wajah tidak dikenal":
+                        print('Mengenali wajah milik: ' + name)
+                        label = 'Mengenali wajah Milik ' + name
+                        
+                        import serial
+                        ser = serial.Serial("/dev/serial0",9600)
+                        kirim_data = '>buka#' + name + '<'
+                        print(kirim_data)
+                        ser.write(kirim_data.encode())
+                        
+                    else:
+                        print('Wajah tidak dikenal')
+                        label = 'Wajah tidak dikenal'
                 else:
-                    print('Wajah tidak dikenal')
-                    label = 'Wajah tidak dikenal'
-            else:
-                checking_done = False
-                print('Menunggu perintah')
-                label = ''
+                    checking_done = False
+                    print('Menunggu perintah')
+                    label = ''
+        except:
+            pass                
                 
     return render_template('index.html', label=label)
 
@@ -81,14 +101,24 @@ def pengaturan():
     if request.method == 'POST':
         try:
             if request.form['hapus'] == 'Hapus':
-                print('menghapus ' + request.form['nama'])
+                nama_yang_dihapus = request.form['nama']
+                print('menghapus ' + nama_yang_dihapus)
                 # mungkin ada yang harus di close
+                
+                os.remove('static/img/' + nama_yang_dihapus + '.jpg')
                 reader = csv.reader(open('static/config.csv'), delimiter=',')
                 f = csv.writer(open("static/config.backup.csv", "w"))
                 for line in reader:
-                    if request.form['nama'] not in line:
+                    if nama_yang_dihapus not in line:
                         f.writerow(line)
                 os.rename('static/config.backup.csv','static/config.csv')
+                
+                import serial
+                ser = serial.Serial("/dev/serial0",9600)
+                kirim_data = '>hapus#' + nama_yang_dihapus + '<'
+                print(kirim_data)
+                ser.write(kirim_data.encode())
+                
                 return redirect(url_for('pengaturan'))
         except:
             pass
@@ -110,6 +140,12 @@ def pengaturan():
             while not check.is_file():
                 pass # Menunggu selesai upload
             
+            import serial
+            ser = serial.Serial("/dev/serial0",9600)
+            kirim_data = '>baru#' + request.form['nama'] + '<'
+            print(kirim_data)
+            ser.write(kirim_data.encode())
+                
             encoded = encode(filename)
             with open('static/config.csv', 'a') as fp:
                 a = csv.writer(fp, delimiter=',')

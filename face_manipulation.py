@@ -34,6 +34,7 @@ def encode(filename):
 
 def check(img):
     
+    face_init()
     # Inisialisasi beberapa vaiable
     face_locations = []
     face_encodings = []
@@ -62,20 +63,15 @@ def check(img):
     
     # menampilkan hasilnya hasilnya
     for (top, right, bottom, left), name in zip(face_locations, face_names):
-        # mwmbuat skala bingkai untuk wajah
-##        top *= 4
-##        right *= 4
-##        bottom *= 4
-##        left *= 4
 
         # gambar kotak disekitar wajah
         frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # memberi label dengan nama dibawah wajah
-        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(frame, (left, bottom + 35), (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, name, (left + 6, bottom + 29), font, 1.0, (255, 255, 255), 1)
     
     cv2.imwrite('result.jpg',frame)        
     return (name, cv2.imencode('.jpg',frame)[1].tobytes())
