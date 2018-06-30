@@ -6,6 +6,7 @@ image = face_recognition.load_image_file("search_out.jpg")
 face_landmarks_list = face_recognition.face_landmarks(image)
 
 for face_landmarks in face_landmarks_list:
+    
     pil_image = Image.fromarray(image)
     d = ImageDraw.Draw(pil_image, 'RGBA')
 

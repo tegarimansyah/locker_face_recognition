@@ -30,11 +30,11 @@ def index():
             if request.form['simpan'] == 'Simpan':
                 print('menyimpan ' + request.form['nama'])
                                         
-                import serial
-                ser = serial.Serial("/dev/serial0",9600)
-                kirim_data = '>simpan#' + request.form['nama'] + '<'
-                print(kirim_data)
-                ser.write(kirim_data.encode())
+##                import serial
+##                ser = serial.Serial("/dev/serial0",9600)
+##                kirim_data = '>simpan#' + request.form['nama'] + '<'
+##                print(kirim_data)
+##                ser.write(kirim_data.encode())
                 
                 return redirect(url_for('/'))
         except:
@@ -55,11 +55,11 @@ def index():
                         print('Mengenali wajah milik: ' + name)
                         label = 'Mengenali wajah Milik ' + name
                         
-                        import serial
-                        ser = serial.Serial("/dev/serial0",9600)
-                        kirim_data = '>buka#' + name + '<'
-                        print(kirim_data)
-                        ser.write(kirim_data.encode())
+##                        import serial
+##                        ser = serial.Serial("/dev/serial0",9600)
+##                        kirim_data = '>buka#' + name + '<'
+##                        print(kirim_data)
+##                        ser.write(kirim_data.encode())
                         
                     else:
                         print('Wajah tidak dikenal')
@@ -113,11 +113,11 @@ def pengaturan():
                         f.writerow(line)
                 os.rename('static/config.backup.csv','static/config.csv')
                 
-                import serial
-                ser = serial.Serial("/dev/serial0",9600)
-                kirim_data = '>hapus#' + nama_yang_dihapus + '<'
-                print(kirim_data)
-                ser.write(kirim_data.encode())
+##                import serial
+##                ser = serial.Serial("/dev/serial0",9600)
+##                kirim_data = '>hapus#' + nama_yang_dihapus + '<'
+##                print(kirim_data)
+##                ser.write(kirim_data.encode())
                 
                 return redirect(url_for('pengaturan'))
         except:
@@ -140,11 +140,11 @@ def pengaturan():
             while not check.is_file():
                 pass # Menunggu selesai upload
             
-            import serial
-            ser = serial.Serial("/dev/serial0",9600)
-            kirim_data = '>baru#' + request.form['nama'] + '<'
-            print(kirim_data)
-            ser.write(kirim_data.encode())
+##            import serial
+##            ser = serial.Serial("/dev/serial0",9600)
+##            kirim_data = '>baru#' + request.form['nama'] + '<'
+##            print(kirim_data)
+##            ser.write(kirim_data.encode())
                 
             encoded = encode(filename)
             with open('static/config.csv', 'a') as fp:
