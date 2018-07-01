@@ -80,14 +80,6 @@ def mengenali_wajah(photo_id):
     success = cek_wajah(photo_id)
     return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url)
 
-@app.route('/photo_data')
-def photo_data():
-    return jsonify({'status':'success','data':data}), 20
-
-@app.route('/photo_data/<int:photo_id>')
-def cek_id(photo_id):
-    return jsonify(data[photo_id-1]), 200
-
 if __name__ == '__main__':
     try:
         ser = serial.Serial("/dev/serial0",9600)
