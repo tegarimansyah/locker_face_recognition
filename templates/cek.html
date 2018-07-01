@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Loker</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"></link>
+<style id="webmakerstyle">
+.bg-gradient {
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(-30deg, #4f70ce 0%, #12bbad 50%, #12bbad 100%);
+  min-height : 100vh;
+  margin:0;
+  padding:2rem;
+}
+
+.link {
+  color:white;
+}
+
+.link:hover {
+  color:#ddd;
+}
+
+.row.image {
+  color: #333;
+}
+
+.card {
+  border:none;
+}
+
+.card-body {
+  text-align:center;
+}
+</style>
+</head>
+<body>
+<div class="jumbotron bg-gradient">
+  <p>
+    <a href="/" class="link">← Kembali</a>
+  </p>
+  <h1 class="display-4">Mengenali Wajah</h1>
+  <p class="lead">Tampilan web untuk meningkatkan keamanan dan mengendalikan loker otomatis.</p>
+  <hr class="my-4">
+  
+  <div class="row image mb-2">
+    <div class="col-sm-12">
+      <div class="card">
+        <h2 class="ml-2 mt-2">
+          Menganalisa Wajah {{ data['name'] }}
+        </h2>
+        <div class="row image mb-2">
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <img src="{{ data['url'] }}" width="400" />
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <img src="{{ test_face_url }}" width="400"/>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+        {% if success %}
+        <div class="text-center mb-3">
+          <strong>Wajah Sesuai</strong><br>
+          <span>Scan Fingerprint</span>
+        </div>
+        {% else %}
+        <div class="text-center mb-3">
+          <strong>Wajah Tidak Sesuai</strong><br>
+          <a href="/">← Kembali</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="filesystem:chrome-extension://lkfkkhfhhdkiemehlpkgjeojomhpccnh/temporary/script.js">
+</script>
+</body>
+</html>

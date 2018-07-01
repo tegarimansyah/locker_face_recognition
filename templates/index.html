@@ -1,91 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Loker</title>
 
-    <title>Automatic Locker</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"></link>
+<style id="webmakerstyle">
+.bg-gradient {
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(-30deg, #4f70ce 0%, #12bbad 50%, #12bbad 100%);
+  min-height : 100vh;
+  margin:0;
+  padding:2rem;
+}
 
-    <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static',filename='css/style.css') }}" rel="stylesheet">
+.row.image {
+  color: #333;
+}
 
-  </head>
-  <body>
+.card {
+  border:none;
+}
 
-    <div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<h3 class="text-center text-primary" style="margin-bottom:20px">
-				Loker Otomatis
-			</h3>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-6">
-			<img alt="Bootstrap Image Preview" src="{{ url_for('video_feed') }}" class="center-block" style="width:100%;height:auto;"> 
-			<form method="post" action="/" style="display:inline;">
-			<input type="submit" name="submit" class="btn btn-lg btn-primary" style="margin-top:10px;" value="Buka Loker">
-			</form>
-			<a id="modal-184946" href="#modal-container-184946" role="button" class="btn btn-lg btn-success" style="margin-top:10px;" data-toggle="modal">Simpan Loker</a>
-		</div>
-		<div class="col-md-6">
-			<div class="row">
-				<div class="col-md-5 display-loker">1
-				</div>
-				<div class="col-md-5 display-loker">2
-				</div>
-				<div class="col-md-5 display-loker">3
-				</div>
-				<div class="col-md-5 display-loker">4
-				</div>
-			</div>
-			{% if label %}
-			<span class="label label-info col-centered">{{ label }}</span>
-			{% endif %}
-		</div>
-	</div>
-	<div class="row" style="margin-top:20px">
-		<div class="col-md-12  text-center">
-			 <!--<a id="modal-184946" href="#modal-container-184946" role="button" class="btn" data-toggle="modal">Pengaturan</a>-->
-			<a href="pengaturan" role="button" class="btn">Pengaturan</a>
-			<div class="modal fade" id="modal-container-184946" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							 
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-								×
-							</button>
-							<h4 class="modal-title" id="myModalLabel">
-								Modal title
-							</h4>
-						</div>
-						<div class="modal-body">
-							<form action="/" method="post" enctype=multipart/form-data>
-								<input type="text" name="nama" placeholder="Masukan Nama" required/>
-								<input type="text" name="loker" placeholder="Nomer Loker" required/>
-								<input type="submit" class="btn btn-primary" name="simpan" value="Simpan" />
-							</form>
-						</div>
-						<div class="modal-footer">
-							 
-							<button type="button" class="btn btn-default" data-dismiss="modal">
-								Batal
-							</button> 
-						</div>
-					</div>
-					
-				</div>
-				
-			</div>
-			
-		</div>
-	</div>
+.card-body {
+  text-align:center;
+}
+</style>
+</head>
+<body>
+<div class="jumbotron bg-gradient">
+  <h1 class="display-4">Loker</h1>
+  <p class="lead">Tampilan web untuk meningkatkan keamanan dan mengendalikan loker otomatis.</p>
+  <hr class="my-4">
+  
+  <div class="row image mb-2">
+    <div class="col-sm-6">
+      <div class="card">
+        <h2 class="ml-2 mt-2">
+          Loker A
+        </h2>
+        <div class="row image mb-2">
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[0]['id'] }}" class="btn btn-primary mb-1">{{ data[0]['name'] }}</a>
+                <br><img src="{{ data[0]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[1]['id'] }}" class="btn btn-primary mb-1">{{ data[1]['name'] }}</a>
+                <br><img src="{{ data[1]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-sm-6">
+      <div class="card">
+        <h2 class="ml-2 mt-2">
+          Loker B
+        </h2>
+        <div class="row image mb-2">
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[2]['id'] }}" class="btn btn-primary mb-1">{{ data[2]['name'] }}</a>
+                <br><img src="{{ data[2]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[3]['id'] }}" class="btn btn-primary mb-1">{{ data[3]['name'] }}</a>
+                <br><img src="{{ data[3]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row image">
+    <div class="col-sm-6">
+      <div class="card">
+        <h2 class="ml-2 mt-2">
+          Loker C
+        </h2>
+        <div class="row image mb-2">
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[4]['id'] }}" class="btn btn-primary mb-1">{{ data[4]['name'] }}</a>
+                <br><img src="{{ data[4]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[5]['id'] }}" class="btn btn-primary mb-1">{{ data[5]['name'] }}</a>
+                <br><img src="{{ data[5]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-sm-6">
+      <div class="card">
+        <h2 class="ml-2 mt-2">
+          Loker D
+        </h2>
+        <div class="row image mb-2">
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[6]['id'] }}" class="btn btn-primary mb-1">{{ data[6]['name'] }}</a>
+                <br><img src="{{ data[6]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6">
+            <div class="card">
+              <div class="card-body">
+                <a href="cek/{{ data[7]['id'] }}" class="btn btn-primary mb-1">{{ data[7]['name'] }}</a>
+                <br><img src="{{ data[7]['url'] }}" width="150"/>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/scripts.js') }}"></script>
-  </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</body>
 </html>

@@ -1,167 +1,109 @@
-#!/usr/bin/env python
-from importlib import import_module
+from flask import Flask, jsonify, render_template, Response
 import os
-import csv
-from flask import Flask, render_template, Response, request, send_from_directory, redirect, url_for
-from werkzeug import secure_filename
-from face_manipulation import encode, check, face_init
+import numpy as np
+import cv2
+from PIL import Image, ImageDraw
+import face_recognition
+import serial
 
-Camera = import_module('camera_opencv').Camera
-UPLOAD_FOLDER = 'static/img'
-ALLOWED_EXTENSIONS = set(['jpeg', 'jpg', 'png'])
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-name = ''
-checking_done = False
+app = Flask(__name__, static_folder='static')
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+def ambil_gambar():
+    cap = cv2.VideoCapture(0)
+    _,frame = cap.read()
+    cv2.imwrite(test_data_url,frame)
+    cap.release()
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    label=''
-    if request.method == 'POST':
-        global checking_done
-        global name
+def compare(photo_id):
+
+    known_image = face_recognition.load_image_file('static/image/' + images[photo_id-1])
+    image = face_recognition.load_image_file(test_data_url)
+
+    biden_encoding = face_recognition.face_encodings(known_image)[0]
+    try:
+        unknown_encoding = face_recognition.face_encodings(image)[0]
+    except:
+        print('Tidak ada wajah')
+        return False
+
+    face_landmarks_list = face_recognition.face_landmarks(image)
+
+    for face_landmarks in face_landmarks_list:
+        pil_image = Image.fromarray(image)
+        d = ImageDraw.Draw(pil_image, 'RGBA')
+
+        d.line(face_landmarks['left_eyebrow'], fill=(255, 255, 255, 255), width=2)
+        d.line(face_landmarks['right_eyebrow'], fill=(255, 255, 255, 255), width=2)
+
+        d.line(face_landmarks['top_lip'], fill=(255, 255, 255, 255), width=2)
+        d.line(face_landmarks['bottom_lip'], fill=(255, 255, 255, 255), width=2)
+
+        d.line(face_landmarks['left_eye'] + [face_landmarks['left_eye'][0]], fill=(255, 255, 255, 255), width=2)
+        d.line(face_landmarks['right_eye'] + [face_landmarks['right_eye'][0]], fill=(255, 255, 255, 255), width=2)
+
+        d.line(face_landmarks['chin'], fill=(255, 255, 255, 255), width=2)
+        d.line(face_landmarks['nose_bridge'], fill=(255, 255, 255, 255), width=2)
         
-        try:
-            if request.form['simpan'] == 'Simpan':
-                print('menyimpan ' + request.form['nama'])
-                                        
-##                import serial
-##                ser = serial.Serial("/dev/serial0",9600)
-##                kirim_data = '>simpan#' + request.form['nama'] + '<'
-##                print(kirim_data)
-##                ser.write(kirim_data.encode())
-                
-                return redirect(url_for('/'))
-        except:
-            pass
-        
-        try:
-            if request.form['submit'] == 'Buka Loker':
-                Camera.save = not Camera.save
-                if Camera.save:
-                    from time import sleep
-                    print('Memeriksa Wajah')
-
-                    checking_done = False
-                    while not checking_done:
-                        pass
-                    
-                    if not name is "Wajah tidak dikenal":
-                        print('Mengenali wajah milik: ' + name)
-                        label = 'Mengenali wajah Milik ' + name
-                        
-##                        import serial
-##                        ser = serial.Serial("/dev/serial0",9600)
-##                        kirim_data = '>buka#' + name + '<'
-##                        print(kirim_data)
-##                        ser.write(kirim_data.encode())
-                        
-                    else:
-                        print('Wajah tidak dikenal')
-                        label = 'Wajah tidak dikenal'
-                else:
-                    checking_done = False
-                    print('Menunggu perintah')
-                    label = ''
-        except:
-            pass                
-                
-    return render_template('index.html', label=label)
-
-def gen(camera):
-    while True:
-        if camera.save:
-             import cv2
-             img = camera.get_frame()
-             global name
-             global checking_done
-             if not checking_done:
-                 name, frame = check(img)
-                 checking_done = True
-                 print("Checking Done")
-             frame = cv2.imencode('.jpg',cv2.imread('result.jpg'))[1].tobytes()
-        else:
-             frame = camera.get_frame().tobytes()
-             
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/pengaturan', methods=['GET', 'POST'])
-def pengaturan():
-    if request.method == 'POST':
-        try:
-            if request.form['hapus'] == 'Hapus':
-                nama_yang_dihapus = request.form['nama']
-                print('menghapus ' + nama_yang_dihapus)
-                # mungkin ada yang harus di close
-                
-                os.remove('static/img/' + nama_yang_dihapus + '.jpg')
-                reader = csv.reader(open('static/config.csv'), delimiter=',')
-                f = csv.writer(open("static/config.backup.csv", "w"))
-                for line in reader:
-                    if nama_yang_dihapus not in line:
-                        f.writerow(line)
-                os.rename('static/config.backup.csv','static/config.csv')
-                
-##                import serial
-##                ser = serial.Serial("/dev/serial0",9600)
-##                kirim_data = '>hapus#' + nama_yang_dihapus + '<'
-##                print(kirim_data)
-##                ser.write(kirim_data.encode())
-                
-                return redirect(url_for('pengaturan'))
-        except:
-            pass
-        
-        try:
-            if request.form['edit'] == 'Edit':
-                print('mengedit ' + request.form['nama'])
-                return redirect(url_for('pengaturan'))
-        except:
-            pass
-        
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            
-            from pathlib import Path
-            check = Path('static/img/'+filename)
-            while not check.is_file():
-                pass # Menunggu selesai upload
-            
-##            import serial
-##            ser = serial.Serial("/dev/serial0",9600)
-##            kirim_data = '>baru#' + request.form['nama'] + '<'
-##            print(kirim_data)
-##            ser.write(kirim_data.encode())
-                
-            encoded = encode(filename)
-            with open('static/config.csv', 'a') as fp:
-                a = csv.writer(fp, delimiter=',')
-                data = [[filename, request.form['nama'], encoded]]
-                print(data)
-                a.writerows(data) 
-    face_init()
+        pil_image.save(test_data_url)
     
-    with open('static/config.csv') as f:
-        reader = csv.reader(f)
-        return render_template('pengaturan.html', reader=reader)
+    return face_recognition.compare_faces([biden_encoding], unknown_encoding)[0]
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
+
+def cek_wajah(photo_id):
+    ambil_gambar()
+    result = compare(photo_id)
+
+    if result:
+        if serial_available:
+            kirim_data = photo_id
+            ser.write(kirim_data.encode())
+        else:
+            print('Serial not available')
+        return True
+    return False
+
+@app.after_request
+def apply_caching(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate" # HTTP 1.1.
+    response.headers["Pragma"] = "no-cache" # HTTP 1.0.
+    response.headers["Expires"] = "0" # Proxies.
+    return response
+
+
+@app.route('/')
+def root():
+    return render_template('index.html', data=data)
+
+@app.route('/cek/<int:photo_id>')
+def mengenali_wajah(photo_id):
+    success = cek_wajah(photo_id)
+    return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url)
+
+@app.route('/photo_data')
+def photo_data():
+    return jsonify({'status':'success','data':data}), 20
+
+@app.route('/photo_data/<int:photo_id>')
+def cek_id(photo_id):
+    return jsonify(data[photo_id-1]), 200
+
 if __name__ == '__main__':
-    face_init()
-    app.run(host='0.0.0.0', threaded=True)
+    try:
+        ser = serial.Serial("/dev/serial0",9600)
+        serial_available = True
+    except:
+        print('Serial not available')
+        serial_available = False
+        
+    images = sorted(os.listdir('static/image/'))
+    data = []
+    for image in images:
+        new_data = {}
+        new_data['url'] = 'http://localhost:5000/static/image/' + image.replace(' ','%20')
+        new_data['id'], new_data['name'], _ = image.split('.')
+        data.append(new_data)
+
+    test_data_url = 'static/test.jpg'
+
+    app.run(debug=True)
