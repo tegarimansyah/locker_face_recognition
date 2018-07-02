@@ -57,6 +57,7 @@
             <div class="card">
               <div class="card-body">
                 <img src="{{ data['url'] }}" width="400" />
+                <div class="mt-2">{{ encoding[0] }}</div>
               </div>
             </div>
           </div>
@@ -65,6 +66,7 @@
             <div class="card">
               <div class="card-body">
                 <img src="{{ test_face_url }}" width="400"/>
+                <div class="mt-2">{{ encoding[1] }}</div>
               </div>
             </div>
           </div>
@@ -73,7 +75,7 @@
         
         {% if success %}
         <div class="text-center mb-3">
-          <strong>Wajah Sesuai</strong><br>
+          <strong>Wajah Sesuai Dengan Kemiripan {{ kemiripan }}</strong><br>
           <span>Scan Fingerprint</span>
         </div>
         {% else %}

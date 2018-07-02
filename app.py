@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, render_template, Response
 import os
-import numpy as np
+# import numpy as np
 import cv2
 from PIL import Image, ImageDraw
 import face_recognition
@@ -21,11 +21,15 @@ def compare(photo_id):
     image = face_recognition.load_image_file(test_data_url)
 
     biden_encoding = face_recognition.face_encodings(known_image)[0]
+
     try:
         unknown_encoding = face_recognition.face_encodings(image)[0]
+        encoding[0], encoding[1] = biden_encoding, unknown_encoding
     except:
         print('Tidak ada wajah')
+        encoding[0], encoding[1] = '', 'Tidak Ditemukan Wajah'
         return False
+    
 
     face_landmarks_list = face_recognition.face_landmarks(image)
 
@@ -47,7 +51,10 @@ def compare(photo_id):
         
         pil_image.save(test_data_url)
     
-    return face_recognition.compare_faces([biden_encoding], unknown_encoding)[0]
+    result = face_recognition.compare_faces([biden_encoding], unknown_encoding)[0]
+    kemiripan[0] = 1 - face_recognition.face_distance([biden_encoding], unknown_encoding)[0]
+    
+    return result
 
 
 def cek_wajah(photo_id):
@@ -78,7 +85,7 @@ def root():
 @app.route('/cek/<int:photo_id>')
 def mengenali_wajah(photo_id):
     success = cek_wajah(photo_id)
-    return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url)
+    return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url, encoding=encoding, kemiripan=kemiripan[0])
 
 if __name__ == '__main__':
     try:
@@ -88,6 +95,8 @@ if __name__ == '__main__':
         print('Serial not available')
         serial_available = False
         
+    encoding = [0, 0]
+    kemiripan = [0]
     images = sorted(os.listdir('static/image/'))
     data = []
     for image in images:
