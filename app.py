@@ -5,12 +5,14 @@ import cv2
 from PIL import Image, ImageDraw
 import face_recognition
 import serial
+import time
 
 
 app = Flask(__name__, static_folder='static')
 
 def ambil_gambar():
     cap = cv2.VideoCapture(0)
+    time.sleep(2)
     _,frame = cap.read()
     cv2.imwrite(test_data_url,frame)
     cap.release()
