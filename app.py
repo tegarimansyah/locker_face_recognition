@@ -52,7 +52,6 @@ def compare(photo_id):
         pil_image.save(test_data_url)
     
     result = face_recognition.compare_faces([biden_encoding], unknown_encoding)[0]
-    kemiripan[0] = 1 - face_recognition.face_distance([biden_encoding], unknown_encoding)[0]
     
     return result
 
@@ -85,7 +84,7 @@ def root():
 @app.route('/cek/<int:photo_id>')
 def mengenali_wajah(photo_id):
     success = cek_wajah(photo_id)
-    return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url, encoding=encoding, kemiripan=kemiripan[0])
+    return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url, encoding=encoding)
 
 if __name__ == '__main__':
     try:
@@ -96,7 +95,6 @@ if __name__ == '__main__':
         serial_available = False
         
     encoding = [0, 0]
-    kemiripan = [0]
     images = sorted(os.listdir('static/image/'))
     data = []
     for image in images:
