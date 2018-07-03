@@ -11,11 +11,8 @@ import time
 app = Flask(__name__, static_folder='static')
 
 def ambil_gambar():
-    cap = cv2.VideoCapture(0)
-    time.sleep(2)
     _,frame = cap.read()
     cv2.imwrite(test_data_url,frame)
-    cap.release()
 
 def compare(photo_id):
 
@@ -89,6 +86,8 @@ def mengenali_wajah(photo_id):
     return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url, encoding=encoding)
 
 if __name__ == '__main__':
+    cap = cv2.VideoCapture(0)
+    time.sleep(2)
     try:
         ser = serial.Serial("/dev/serial0",9600)
         serial_available = True
@@ -108,3 +107,5 @@ if __name__ == '__main__':
     test_data_url = 'static/test.jpg'
 
     app.run(debug=True)
+
+    cap.release()
