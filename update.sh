@@ -1,1 +1,2 @@
-git pull origin dev
+git fetch --all
+git reset --hard origin/dev

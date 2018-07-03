@@ -12,9 +12,8 @@ app = Flask(__name__, static_folder='static')
 
 def ambil_gambar():
     cap = cv2.VideoCapture(0)
-    time.sleep(3)
     _,frame = cap.read()
-    time.sleep(1)
+    time.sleep(2)
     cv2.imwrite(test_data_url,frame)
     cap.release()
 
