@@ -14,8 +14,8 @@ def ambil_gambar():
     cap = cv2.VideoCapture(0)
     time.sleep(3)
     _,frame = cap.read()
-    cv2.imwrite(test_data_url,frame)
     time.sleep(1)
+    cv2.imwrite(test_data_url,frame)
     cap.release()
 
 def compare(photo_id):
