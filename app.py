@@ -1,19 +1,27 @@
-from flask import Flask, jsonify, render_template, Response
+from flask import Flask, jsonify, render_template, Response, request, url_for
 import os
-# import numpy as np
+from importlib import import_module
 import cv2
 from PIL import Image, ImageDraw
 import face_recognition
 import serial
 import time
 
-
+Camera = import_module('camera_opencv').Camera
 app = Flask(__name__, static_folder='static')
 
 def ambil_gambar():
     cap = cv2.VideoCapture(0)
-    _,frame = cap.read()
-    time.sleep(2)
+    if not cap.isOpened():
+        raise RuntimeError('Could not start camera.')
+    
+    import time
+    now = time.time()
+    while True:
+        _,frame = cap.read()
+        if now+3 < time.time():
+            break
+
     cv2.imwrite(test_data_url,frame)
     cap.release()
 
@@ -85,8 +93,35 @@ def root():
 
 @app.route('/cek/<int:photo_id>')
 def mengenali_wajah(photo_id):
+    # if 'save' in request.args:
     success = cek_wajah(photo_id)
     return render_template('cek.html', data=data[photo_id-1], success=success, test_face_url='http://localhost:5000/'+test_data_url, encoding=encoding)
+    # else:
+    #     return render_template('cek.html', data=data[photo_id-1], success='', test_face_url=url_for('video_feed'), encoding='')
+
+def gen(camera):
+    while True:
+        # if camera.save:
+        #      import cv2
+        #      img = camera.get_frame()
+        #      global name
+        #      global checking_done
+        #      if not checking_done:
+        #          name, frame = check(img)
+        #          checking_done = True
+        #          print("Checking Done")
+        #      frame = cv2.imencode('.jpg',cv2.imread('result.jpg'))[1].tobytes()
+        # else:
+        #      frame = camera.get_frame().tobytes()
+        frame = camera.get_frame().tobytes()
+             
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     try:
@@ -108,3 +143,4 @@ if __name__ == '__main__':
     test_data_url = 'static/test.jpg'
     
     app.run(debug=True)
+    # app.run()
